@@ -1,0 +1,43 @@
+#1. Papkalarni powershellda yasab olamiz
+mkdir backend; mkdir backend/config; mkdir backend/controllers; 
+mkdir backend/middlewares; mkdir backend/models; 
+mkdir backend/routes; mkdir backend/utils
+
+#2. Fayllarni powershellda yasab olamiz
+New-Item backend/app.js -ItemType File
+New-Item backend/server.js -ItemType File
+New-Item backend/.env -ItemType File
+
+New-Item backend/config/db.js -ItemType File
+
+New-Item backend/controllers/userController.js -ItemType File
+New-Item backend/controllers/productController.js -ItemType File
+
+New-Item backend/middlewares/authMiddleware.js -ItemType File
+New-Item backend/middlewares/errorMiddleware.js -ItemType File
+
+New-Item backend/models/User.js -ItemType File
+New-Item backend/models/Product.js -ItemType File
+
+New-Item backend/routes/userRoutes.js -ItemType File
+New-Item backend/routes/productRoutes.js -ItemType File
+
+New-Item backend/utils/generateToken.js -ItemType File
+
+#3. package.json ichida scripts qo‘shamiz:
+
+"scripts": {
+  "start": "node server.js",
+  "dev": "nodemon server.js"
+}
+
+#4. Mongodb'ni ulab olamiz. db.js
+#5. User modelini yozib olamiz
+hamma mahsulot boshqalarni faqat backendda qo‘shamiz
+
+
+http://localhost:5000/api/users/login
+http://localhost:5000/api/users/register
+http://localhost:5000/api/products/:id
+
+

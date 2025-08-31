@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🔥 Super E-Commerce</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ece9e6, #ffffff);
+    }
+    nav {
+      background: #0077b6;
+      padding: 12px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    nav h1 { margin: 0; }
+    #nav-right { display: flex; gap: 15px; align-items: center; }
+    #nav-right button, #nav-right a {
+      background: #ff5722;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+    #nav-right button:hover, #nav-right a:hover { background: #e64a19; }
+
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 0 15px;
+    }
+    .product {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s;
+      animation: fadeIn 0.3s ease;
+    }
+    .product:hover { transform: translateY(-5px); }
+    .product img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .product h3 { margin: 10px 0 5px; }
+    .product p { font-size: 14px; color: #555; text-align: center; }
+    .product strong { font-size: 18px; color: #0077b6; margin: 5px 0; }
+
+    .product button {
+      border: none;
+      padding: 8px 14px;
+      margin: 4px 2px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+    .add-btn { background: #0077b6; color: white; }
+    .buy-btn { background: #28a745; color: white; }
+    .delete-btn { background: #dc3545; color: white; }
+    .add-btn:hover { background: #005f8a; }
+    .buy-btn:hover { background: #1e7e34; }
+    .delete-btn:hover { background: #b52a37; }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      width: 350px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .modal-content h2 { margin-top: 0; color: #0077b6; }
+    .modal-content input {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .modal-content button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #0077b6;
+      color: white;
+      font-weight: bold;
+    }
+    .modal-content button:hover { background: #005f8a; }
+    .close {
+      position: absolute;
+      right: 10px; top: 10px;
+      cursor: pointer;
+      color: red;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+    .cart-bounce { animation: bounce 0.4s; }
+    @keyframes bounce {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h1>🔥 Super Shop</h1>
+    <div id="nav-right">
+      <!-- JS bilan to‘ldiriladi -->
+    </div>
+  </nav>
+
+  <main id="product-list">
+    <!-- Mahsulotlar JS orqali keladi -->
+  </main>
+
+  <!-- 🔹 Auth Modal -->
+  <div id="authModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">✖</span>
+      <h2 id="modalTitle">Login</h2>
+      <input type="text" id="nameField" placeholder="Full Name (registerda)" style="display:none;">
+      <input type="email" id="emailField" placeholder="Email">
+      <input type="password" id="passwordField" placeholder="Password">
+      <button onclick="submitAuth()">Submit</button>
+      <p style="margin-top:10px; text-align:center;">
+        <a href="#" onclick="toggleAuthMode()">Switch to Register</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:5000/api/products";
+    const USER_API = "http://localhost:5000/api/users";
+    let authMode = "login"; // yoki "register"
+
+    // 🔹 Navbar yangilash
+    function updateNavbar() {
+      const navRight = document.getElementById("nav-right");
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user && user.name) {
+        navRight.innerHTML = `
+          <span>👋 Welcome, <b>${user.name}</b></span>
+          <button onclick="logout()">Logout</button>
+          <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        `;
+      } else {
+        navRight.innerHTML = `
+          <button onclick="openModal()">Login / Register</button>
+          <a href="cart.html">🛒 Cart (<span id="cart-count">0</span>)</a>
+        `;
+      }
+      updateCartCount();
+    }
+
+    // 🔹 Cart count
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const el = document.getElementById("cart-count");
+      if (el) {
+        el.innerText = cart.reduce((sum, i) => sum + (i.qty || 1), 0);
+        el.classList.add("cart-bounce");
+        setTimeout(()=>el.classList.remove("cart-bounce"), 400);
+      }
+    }
+
+    // 🔹 Mahsulotlarni olish
+    async function fetchProducts() {
+      try {
+        const res = await fetch(API_URL);
+        const products = await res.json();
+        const productList = document.getElementById("product-list");
+        productList.innerHTML = "";
+        products.forEach(product => {
+          const div = document.createElement("div");
+          div.classList.add("product");
+          div.innerHTML = `
+            <img src="${product.imageUrl || 'https://via.placeholder.com/200'}" alt="${product.name}">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <strong>$${product.price}</strong>
+            <div>
+              <button class="add-btn" onclick="addToCart('${product._id}','${product.name}',${product.price},'${product.imageUrl}')">Add to Cart</button>
+              <button class="buy-btn" onclick="buyNow('${product.name}',${product.price})">Buy Now</button>
+              <button class="delete-btn" onclick="deleteProduct('${product._id}')">❌ Delete</button>
+            </div>
+          `;
+          productList.appendChild(div);
+        });
+      } catch(err){ console.error(err); }
+    }
+
+    function addToCart(id,name,price,image){
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      cart.push({ id,name,price,image, qty:1 });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartCount();
+    }
+
+    function buyNow(name,price){
+      alert(`🛒 You chose to buy: ${name} for $${price}`);
+    }
+
+    async function deleteProduct(id){
+      const user = JSON.parse(localStorage.getItem("user"));
+      if(!user || !user.token) return alert("❌ Only admin can delete!");
+      if(confirm("Mahsulotni o‘chirasizmi?")){
+        const res = await fetch(`${API_URL}/${id}`,{
+          method:"DELETE",
+          headers:{ Authorization:`Bearer ${user.token}` }
+        });
+        const data = await res.json();
+        alert(data.message);
+        fetchProducts();
+      }
+    }
+
+    // 🔹 Auth modal
+    function openModal(){ document.getElementById("authModal").style.display="flex"; }
+    function closeModal(){ document.getElementById("authModal").style.display="none"; }
+    function toggleAuthMode(){
+      authMode = (authMode==="login"?"register":"login");
+      document.getElementById("modalTitle").innerText = authMode==="login"?"Login":"Register";
+      document.getElementById("nameField").style.display = authMode==="register"?"block":"none";
+    }
+    async function submitAuth(){
+      const email=document.getElementById("emailField").value;
+      const password=document.getElementById("passwordField").value;
+      if(authMode==="register"){
+        const name=document.getElementById("nameField").value;
+        const res=await fetch(`${USER_API}/register`,{
+          method:"POST", headers:{ "Content-Type":"application/json" },
+          body:JSON.stringify({name,email,password})
+        });
+        const data=await res.json();
+        if(res.ok){ localStorage.setItem("user",JSON.stringify(data)); closeModal(); updateNavbar(); }
+        else alert(data.message);
+      } else {
+        const res=await fetch(`${USER_API}/login`,{
+          method:"POST", headers:{ "Content-Type":"application/json" },
+          body:JSON.stringify({email,password})
+        });
+        const data=await res.json();
+        if(res.ok){ localStorage.setItem("user",JSON.stringify(data)); closeModal(); updateNavbar(); }
+        else alert(data.message);
+      }
+    }
+
+    function logout(){ localStorage.removeItem("user"); updateNavbar(); }
+
+    // 🔹 Init
+    fetchProducts();
+    updateNavbar();
+  </script>
+</body>
+</html>

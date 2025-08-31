@@ -1,0 +1,108 @@
+/* Umumiy */
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  background: #f7f7f7;
+  color: #333;
+}
+
+nav {
+  background: #0077b6;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+nav a {
+  color: #ffe066;
+  font-weight: bold;
+  text-decoration: none;
+  margin-left: 15px;
+}
+
+main {
+  padding: 20px;
+}
+
+/* Product grid */
+#product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.product {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
+
+.product:hover {
+  transform: translateY(-5px);
+}
+
+.product img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Buttons */
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.add-btn { background: #28a745; color: white; }
+.add-btn:hover { background: #218838; }
+
+.buy-btn { background: #ff5722; color: white; margin-left: 8px; }
+.buy-btn:hover { background: #e64a19; }
+
+/* Forms (login/register) */
+.form-container {
+  max-width: 400px;
+  margin: 40px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.form-container input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.form-container button {
+  width: 100%;
+  background: #0077b6;
+  color: white;
+}
+
+.form-container button:hover {
+  background: #005f8a;
+}
